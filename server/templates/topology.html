@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html
+  xmlns="http://www.w3.org/1999/xhtml"
+  xml:lang="utf-8"
+  lang="utf-8"
+  dir="ltr"
+>
+  <head>
+    <title></title>
+    <link href="/static/ont.css" rel="stylesheet" type="text/css" />
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css"
+      rel="stylesheet"
+      integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC"
+      crossorigin="anonymous"
+    />
+  </head>
+  <body>
+    <nav class="navbar navbar-expand-lg navbar-light bg-light">
+      <div
+        style="
+          margin-left: 20%;
+          display: flex;
+          flex-wrap: inherit;
+          align-items: center;
+        "
+      >
+        <a class="navbar-brand" href="#">Network Admin UI</a>
+        <div>
+          <ul class="navbar-nav me-auto mb-2 mb-lg-0 d-flex">
+            <li class="nav-item">
+              <a
+                class="nav-link active"
+                aria-current="page"
+                href="{{ url_for('topology')}}"
+                >Topology</a
+              >
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="{{ url_for('config')}}"
+                >Configuration</a
+              >
+            </li>
+          </ul>
+        </div>
+      </div>
+    </nav>
+    <div id="wrapper">
+      <div id="content_right">
+        <h1 id="content_title">Topology</h1>
+        {% if error is defined %}
+        <div class="alert alert-danger">{{ error }}</div>
+        {%endif %}
+        <div id="cfgarea">
+          <div class="cfgstep">
+            <p><strong>Switches</strong></p>
+            <table id="device_list" class="commonlist">
+              <tbody>
+                <tr>
+                  <th>Device</th>
+                  <th>Port</th>
+                  <th>Destination</th>
+                  <th>Destination Port</th>
+                </tr>
+                {% for switch in list_switch %} {% if switch.node_link == 0 %}
+                <tr>
+                  <td>
+                    <b>Switch ID:</b> {{switch.node_id}} <br /><b
+                      >Switch name:</b
+                    >
+                    {{switch.node_name}}
+                  </td>
+                  <td colspan="3">No link to switch</td>
+                </tr>
+                {% else %} {% for link in switch.node_link %}
+                <tr>
+                  {% if loop.first %}
+                  <td rowspan="{{loop.length}}">
+                    <b>Switch ID:</b> {{switch.node_id}} <br /><b
+                      >Switch name:</b
+                    >
+                    {{switch.node_name}}
+                  </td>
+                  {% endif %}
+                  <td>{{link.src_port}}</td>
+                  <td>{{link.dst_name}}</td>
+                  <td>{{link.dst_port}}</td>
+                </tr>
+                {% endfor %} {% endif %} {% endfor %}
+              </tbody>
+            </table>
+          </div>
+          <div class="cfgstep">
+            <p><strong>Hosts</strong></p>
+            <table id="device_list" class="commonlist">
+              <tbody>
+                <tr>
+                  <th>Host ID</th>
+                  <th>Host name</th>
+                  <th>Host IP</th>
+                  <th>Destination</th>
+                  <th>Destination Port</th>
+                </tr>
+                {% for host in list_host %} {% for link in host.node_link %}
+                <tr>
+                  <td>{{host.node_id}}</td>
+                  <td>{{host.node_name}}</td>
+                  <td>{{host.node_ip}}</td>
+                  <td>{{host.node_link[0].dst_name}}</td>
+                  <td>{{host.node_link[0].dst_port}}</td>
+                </tr>
+                {% endfor %} {% endfor %}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+      <div id="footer">Nhom 1. Mang SDN.</div>
+    </div>
+  </body>
+</html>
