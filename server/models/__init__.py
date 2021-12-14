@@ -1,4 +1,4 @@
-from server.config import *
+import json
 
 def auto_str(cls):
 
@@ -48,17 +48,15 @@ class Flow():
         self.src_mac = src_mac
         self.dst_mac = dst_mac
 
-    def json_format(self, is_private):
-        if is_private == False:
-            json_flow = '''
-            {
-                "flow-node-inventory:flow": [
+    def as_dict(self):
+        json_flow = {
+            "flow-node-inventory:flow": [
                 {
-                    "id": "%s",
+                    "id": str(self.flow_id),
                     "priority": 2,
-                    "table_id": %s,
+                    "table_id": str(self.table_id),
                     "match": {
-                        "in-port": "%s"
+                        "in-port": str(self.inport)
                     },
                     "instructions": {
                         "instruction": [
@@ -70,7 +68,7 @@ class Flow():
                                             "order": 0,
                                             "output-action": {
                                                 "max-length": 65535,
-                                                "output-node-connector": "%s"
+                                                "output-node-connector": str(self.outport)
                                             }
                                         }
                                     ]
@@ -80,51 +78,19 @@ class Flow():
                     },
                     "idle-timeout": 0
                 }
-                ]
-            }
-            '''
-            json_flow = json_flow % (str(self.flow_id), str(self.table_id), str(self.inport), str(self.outport))
-        else:
-            json_flow = '''
-            {
-                "flow-node-inventory:flow": [
-                {
-                    "id": "%s",
-                    "priority": 2,
-                    "table_id": %s,
-                    "match": {
-                        "in-port": "%s",
-                        "ethernet-match": {
-                            "ethernet-source": {
-                                "address": "%s"
-                            },
-                            "ethernet-destination": {
-                                "address": "%s"
-                            }
-                        }
+            ]
+        }
+        
+        if self.src_mac:
+            match = json_flow["flow-node-inventory:flow"][0]["match"]
+            match.update({
+                "ethernet-match": {
+                    "ethernet-source": {
+                        "address": self.src_mac, 
                     },
-                    "instructions": {
-                        "instruction": [
-                            {
-                                "order": 0,
-                                "apply-actions": {
-                                    "action": [
-                                        {
-                                            "order": 0,
-                                            "output-action": {
-                                                "max-length": 65535,
-                                                "output-node-connector": "%s"
-                                            }
-                                        }
-                                    ]
-                                }
-                            }
-                        ]
-                    },
-                    "idle-timeout": 0
+                    "ethernet-destination": {
+                        "address": self.dst_mac,
+                    }
                 }
-                ]
-            }
-            '''
-            json_flow = json_flow % (str(self.flow_id), str(self.table_id), str(self.inport), self.src_mac, self.dst_mac, str(self.outport))
+            })
         return json_flow

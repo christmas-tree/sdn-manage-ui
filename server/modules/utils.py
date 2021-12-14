@@ -17,23 +17,28 @@ class ODLRequest:
     @staticmethod
     def _processResp(resp):
         resp.raise_for_status()
-        return resp.json()
+        return resp.json() if resp.text else {}
 
     @staticmethod
     def get(_url):
         url, headers, auth = ODLRequest._getParams(_url)
+        print(f"\033[1mSending GET\033[0m {url}")
         resp = requests.get(url, headers=headers, auth=auth)
         return ODLRequest._processResp(resp)
 
     @staticmethod
     def put(_url, dict_obj):
         url, headers, auth = ODLRequest._getParams(_url)
+        print(f"\033[1mSending PUT\033[0m {url}")
         resp = requests.put(url, json.dumps(dict_obj), headers=headers, auth=auth)
+        print(json.dumps(dict_obj))
+        print("\033[1mStatus code: \033[0m", resp.status_code)
         return ODLRequest._processResp(resp)
 
     @staticmethod
     def delete(_url):
         url, headers, auth = ODLRequest._getParams(_url)
+        print(f"\033[1mSending DELETE\033[0m {url}")
         resp = requests.delete(url, headers=headers, auth=auth)
         return ODLRequest._processResp(resp)
 
@@ -82,7 +87,7 @@ def dijkstra(graph, src, dst, visited=[], distances={}, predecessors={}):
         return dijkstra(graph, x, dst, visited, distances, predecessors)
 
 
-def dijkstraRouteHelperFunction(links, list_switch, list_host, src, dst):
+def generate_dijkstra_path(links, list_switch, list_host, src, dst):
     graphDic = {}  # empty dictionary
 
     for node in list_switch:  # make switch dictionary without links
@@ -98,32 +103,32 @@ def dijkstraRouteHelperFunction(links, list_switch, list_host, src, dst):
     return path
 
 
-def customRouteHelperFunction(links, switchs, hosts, src, dst, selected_switchs):
+def generate_custom_path(links, switches, hosts, src, dst, selected_switches):
     graphDic = {}  # empty dictionary
     path = []
-    for node in switchs:  # make switch dictionary without links
+    for node in switches:  # make switch dictionary without links
         graphDic[node.node_id] = {}
     for node in hosts:
         graphDic[node.node_id] = {}
     for edge in links:  # adds each link to each switch
         graphDic[edge.src_id][edge.dest_id] = 1
         graphDic[edge.dest_id][edge.src_id] = 1
-    tmp_switchs = None
-    for switch in selected_switchs:
+    tmp_switches = None
+    for switch in selected_switches:
         if(switch in path):
             continue
         tmp_path = dijkstra(graphDic, src, switch, visited=[],
                             distances={}, predecessors={})
         for point in tmp_path:
-            if (point == tmp_switchs):
+            if (point == tmp_switches):
                 continue
             path.append(point)
         src = switch
-        tmp_switchs = switch
+        tmp_switches = switch
     tmp_path = dijkstra(graphDic, src, dst, visited=[],
                         distances={}, predecessors={})
     for point in tmp_path:
-        if (point == tmp_switchs):
+        if (point == tmp_switches):
             continue
         path.append(point)
     return path
