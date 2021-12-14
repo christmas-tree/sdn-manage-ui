@@ -18,12 +18,12 @@
      sudo mn --controller=remote,ip=[odl-ip] --custom mininet/topo.py --topo topo --switch ovsk,protocols=OpenFlow13
      ```
   3. On [3], create venv and install dependencies
-    ```
-    cd server
-    python3 -m venv venv
-    source venv/bin/activate
-    pip3 install -r requirements.txt
-    ```
+     ```
+     cd server
+     python3 -m venv venv
+     source venv/bin/activate
+     pip3 install -r requirements.txt
+     ```
   4. Update your ODL's IP by changing the `BASE_URL` variable in `server/config.py`
   5. Start the server:
      ```
