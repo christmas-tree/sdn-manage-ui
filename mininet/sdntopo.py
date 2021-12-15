@@ -2,10 +2,7 @@ from mininet.topo import Topo
 
 
 class MyTopo(Topo):
-    "Simple topology example."
-
     def __init__(self):
-        "Create custom topo."
         Topo.__init__(self)
 
         # Add hosts and switches
@@ -18,7 +15,6 @@ class MyTopo(Topo):
         h7 = self.addHost('h7')
         h8 = self.addHost('h8')
         h9 = self.addHost('h9')
-        h10 = self.addHost('h10')
 
         # Them cac switch
         s1 = self.addSwitch('s1')
@@ -30,7 +26,6 @@ class MyTopo(Topo):
         s7 = self.addSwitch('s7')
         s8 = self.addSwitch('s8')
         s9 = self.addSwitch('s9')
-        s10 = self.addSwitch('s10')
 
         # Add links
         self.addLink(h1, s1)
@@ -41,8 +36,7 @@ class MyTopo(Topo):
         self.addLink(h6, s6)
         self.addLink(h7, s7)
         self.addLink(h8, s9)
-        self.addLink(h9, s10)
-        self.addLink(h10, s10)
+        self.addLink(h9, s9)
 
         self.addLink(s1, s2)
         self.addLink(s1, s3)
@@ -55,10 +49,7 @@ class MyTopo(Topo):
         self.addLink(s5, s8)
         self.addLink(s6, s9)
         self.addLink(s7, s8)
-        self.addLink(s7, s10)
         self.addLink(s8, s9)
-        self.addLink(s8, s10)
-        self.addLink(s9, s10)
         self.addLink(s1, s7)
 
 

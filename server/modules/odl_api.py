@@ -1,6 +1,6 @@
 import json
 import time
-import random
+import uuid
 import urllib.parse
 import os.path
 from server.modules.utils import ODLRequest, generate_custom_path, generate_dijkstra_path
@@ -29,7 +29,6 @@ def _set_host(node):
     host_tracker_addresses = node['host-tracker-service:addresses'][0]
     node_ip = host_tracker_addresses['ip']
     node_id = node['node-id']
-    # Chi dung neu mininet co --mac de tao Mac don gian 00:00:00:00:00:01
     node_name = 'h' + str(int(node_ip.split(".")[-1]))
     node_mac = host_tracker_addresses['mac']
     node_link = list()
@@ -73,7 +72,6 @@ def _set_link(links, list_host, list_switch):
                 if s.node_id == dst:
                     dst_switch = s
                     break
-            # dst_index = idx
             node_link.dst_id = dst_switch.node_id
             node_link.dst_name = dst_switch.node_name
             node_link.dst_port = int(link['destination']['dest-tp'][-1])
@@ -146,7 +144,7 @@ def get_flow(switch):
     node_flows = []
     for f in list_flow:
         flow_id = f['id']
-        port_in = f.get('match', {}).get('in-port', "")
+        match = json.dumps(f['match']) if 'match' in f else ""
         priority = f['priority']
         if 'instructions' in f:
             actions = []
@@ -167,7 +165,7 @@ def get_flow(switch):
 
         node_flows.append({
             'flow_id': flow_id,
-            'port_in': port_in,
+            'match': match,
             'actions': actions,
             'priority': priority,
         })
@@ -222,7 +220,7 @@ def delete_all_flow():
 
 
 def add_flow(switch, inport, outport, src_mac, dst_mac):
-    flow_id = random.randrange(0, 500)
+    flow_id = "nhom1-" + str(uuid.uuid4())[-4:]
     table_id = 0
     switch = _get_node(switch)
     switch_id = switch.node_id
@@ -234,7 +232,7 @@ def add_flow(switch, inport, outport, src_mac, dst_mac):
     ODLRequest.put(url, body)
 
 
-def create_flows(path, is_private):
+def create_flows(path):
     for idx, node in enumerate(path):
         path[idx] = _get_node(node)
     first_port = 0
@@ -247,17 +245,14 @@ def create_flows(path, is_private):
                 first_port = link.src_port
             if link.dst_name == path[idx + 1].node_name:
                 second_port = link.src_port
-        if is_private == False:
-            add_flow(path[idx], first_port, second_port, None, None)
-            add_flow(path[idx], second_port, first_port, None, None)
-        else:
-            add_flow(path[idx], first_port, second_port,
-                     path[0].node_mac, path[-1].node_mac)
-            add_flow(path[idx], second_port, first_port,
-                     path[-1].node_mac, path[0].node_mac)
+
+        add_flow(path[idx], first_port, second_port,
+                    path[0].node_mac, path[-1].node_mac)
+        add_flow(path[idx], second_port, first_port,
+                    path[-1].node_mac, path[0].node_mac)
 
 
-def route_dijkstra(nodes, is_private):
+def route_dijkstra(nodes):
     src = _get_node(nodes[0]).node_id
     dst = _get_node(nodes[-1]).node_id
     try:
@@ -267,10 +262,10 @@ def route_dijkstra(nodes, is_private):
     except:
         raise Exception(
             "Cannot routing because all connections between switches are unavailable. Please use custom mode.")
-    create_flows(list(path), is_private)
+    create_flows(list(path))
     return path
 
-def route_custom(nodes, is_private):
+def route_custom(nodes):
     list_node = list(map(lambda x: _get_node(x), nodes))
 
     src = list_node[0].node_id
@@ -285,5 +280,5 @@ def route_custom(nodes, is_private):
     except:
         raise Exception(
             "Cannot routing because all connections between switches are unavailable.")
-    create_flows(list(path), is_private)
+    create_flows(list(path))
     return path

@@ -1,4 +1,4 @@
-from flask import Flask, render_template, request, jsonify, flash, url_for, redirect
+from flask import Flask, render_template, request, flash, url_for, redirect
 from server.modules import odl_api
 import json
 import traceback
@@ -127,6 +127,6 @@ def route_custom():
 
 
 if __name__ == "__main__":
-    app.run(debug=True, host='0.0.0.0', port=8080)
+    app.run(host='0.0.0.0', port=8080)
 
 # dpctl dump-flows -O OpenFlow13
