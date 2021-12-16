@@ -15,19 +15,19 @@ def auto_str(cls):
 @auto_str
 class Switch():
     def __init__(self, node_id, node_name, node_link, node_flow):
-        self.node_id = node_id  # E.g openflow:1
-        self.node_name = node_name  # E.g s1
-        self.node_link = node_link  # json {src-name : s1, src-port : 1, dest-name : s3, dest-port : 2}
+        self.node_id = node_id
+        self.node_name = node_name
+        self.node_link = node_link
         self.node_flow = node_flow
 
 @auto_str
 class Host():
     def __init__(self, node_id, node_name, node_mac, node_ip, node_link):
-        self.node_id = node_id  # E.g host:00:00:00:00:00:01
-        self.node_name = node_name  # E.g h1
-        self.node_mac = node_mac  # E.g 00:00:00:00:00:01
-        self.node_ip = node_ip  # E.g 10.0.0.1
-        self.node_link = node_link  # json {src-name : h1, src-port : None, dest-name : s3, dest-port : 2} = Link
+        self.node_id = node_id
+        self.node_name = node_name
+        self.node_mac = node_mac
+        self.node_ip = node_ip
+        self.node_link = node_link
 
 @auto_str
 class Link():
